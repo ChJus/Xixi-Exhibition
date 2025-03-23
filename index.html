@@ -93,7 +93,7 @@
 
     span {
       width: 70%;
-      display: inline-block;
+      display: inline;
       margin: auto;
       line-height: 1.6;
       font-size: 20pt;
@@ -113,6 +113,10 @@
       width: 100vw;
       font-size: 15pt;
     }
+
+    .color {
+      color: rgb(24, 147, 147);
+    }
   </style>
 </head>
 <body>
@@ -127,7 +131,7 @@
   let quotes = ["家裡的人都那樣呼喚我；小魚兒是我年幼時親人給我起的小名\n（123-124）《感冒》",
     "醫生說：“小魚兒，你是魚，游泳最適合你了。”\n（146）《感冒》",
     "我是魚，我是魚。水流那樣地衝擊我，我知道我是魚。\n（153）《感冒》",
-    "“該則麼做活潑的魚了” “為什麼要做一條過河的枯魚”\n（153）《感冒》",
+    "“該怎麼做活潑的魚了” “為什麼要做一條過河的枯魚”\n（153）《感冒》",
     "魚戲蓮葉東，魚戲蓮葉南....\n（153）《感冒》",
     "我就把你給我的串鈴帶去了，是許多的冰塊垂掛在一些細繩上，當我走路，冰塊擊撞在一起，發出玎玎的聲音。我也把我手雕的冰魚帶去了，我告訴他們，我的玩具是奇異的，由自己的手仔細鑿成，每一次都有不同的樣子。但是他們看不見。他們並且不相信。\n（5）《玩具》",
     "冰魚一點一點地融化了，水從指縫間滴落在地面，起先，冰魚會隱去一條尾巴，然後整個身體縮小了，變瘦了，漸漸剩下一個模糊的長條子，終於完全消失。冰串的鈴也一樣，留下空晃晃的繩段，系在一截窄木條子上。這算什麼玩具呢，他們說。\n（5–6）《玩具》",
@@ -137,6 +141,7 @@
     "你是賣魚的。你是一個會做冰雕的賣魚人。我並不知道你是先開始賣魚然後才做雕刻，還是先開始做雕刻然後才賣魚，這一定是一個有趣的故事。但你說，這分別是一點也不重要的。\n（8）《玩具》",
     "魚鱗飛躍起來的時候，真像你做雕刻的樣子你，那些細碎的冰塊，也是那樣子汨汨地四射著，也是一樣光亮明燦，也是一樣充滿了水的感覺，也是一樣地寒冷，著就是我喜歡來看你賣魚的緣故了。你其實不是在賣魚的，是嗎？你是繼續在做著雕刻，祗不過手裡握著的是魚，不是冰。不不，是在賣魚，你說。\n（9）《玩具》"];
 
+  init();
 
   for (let i = 0; i < 100; i++) {
     await refresh()
@@ -147,13 +152,13 @@
     showUpdatePopup(i);
     console.log(quotes[i].length)
 
-    await sleep(quotes[i].length * 400);
+    await sleep(quotes[i].length * 370);
     hidePopup();
     await sleep(2000);
   }
 
   function showUpdatePopup(i) {
-    document.querySelector("#overlay span").innerHTML = quotes[i].replaceAll("\n", "<br/>");
+    document.querySelector("#overlay span").innerHTML = quotes[i].replaceAll("\n", "<br/>").replaceAll("魚", "<span class='color'>魚</span>");
     d3.select("#overlay span").attr("class", "c" + Math.ceil(Math.random() * 9))
     d3.select("#overlay")
         .style("opacity", "1")
@@ -166,6 +171,12 @@
 
   function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  function init() {
+    for (let i = 1; i <= 9; i++) {
+      d3.select("#overlay span").attr("class", "c" + i)
+    }
   }
 
 </script>
