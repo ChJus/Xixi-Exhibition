@@ -5,15 +5,168 @@
   <title>西西展覽</title>
   <style>
     @font-face {
-      src: url("字體/");
-      font-family: "";
+      src: url("字體/FZFangSong-Z02 Regular.ttf");
+      font-family: "FZFangSong";
     }
 
+    @font-face {
+      src: url("字體/GenRyuMin JP Bold.ttf");
+      font-family: "GenRyuMin";
+    }
+
+    @font-face {
+      src: url("字體/HanWangWeBe Regular.ttf");
+      font-family: "HanWangWeBe";
+    }
+
+    @font-face {
+      src: url("字體/Hanyi Senty Journal Regular.ttf");
+      font-family: "HanyiJournal";
+    }
+
+    @font-face {
+      src: url("字體/Hanyi Senty Lingfei Scroll Regular.ttf");
+      font-family: "HanyiLingfei";
+    }
+
+    @font-face {
+      src: url("字體/HanyiSentyBubbleTea Regular.ttf");
+      font-family: "HanyiBubble";
+    }
+
+    @font-face {
+      src: url("字體/HanyiSentyGarden Regular.ttf");
+      font-family: "HanyiGarden";
+    }
+
+    @font-face {
+      src: url("字體/HanyiSentyJoy Regular.ttf");
+      font-family: "HanyiJoy";
+    }
+
+    @font-face {
+      src: url("字體/Source Han Sans CN Light.otf");
+      font-family: "SourceHans";
+    }
+
+    .c1 {
+      font-family: "FZFangSong";
+    }
+
+    .c2 {
+      font-family: "GenRyuMin";
+    }
+
+    .c3 {
+      font-family: "HanWangWeBe";
+    }
+
+    .c4 {
+      font-family: "HanyiJournal";
+    }
+
+    .c5 {
+      font-family: "HanyiLingfei";
+    }
+
+    .c6 {
+      font-family: "HanyiBubble";
+    }
+
+    .c7 {
+      font-family: "HanyiGarden";
+    }
+
+    .c8 {
+      font-family: "HanyiJoy";
+    }
+
+    .c9 {
+      font-family: "SourceHans";
+    }
+
+    body {
+      margin: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    span {
+      width: 70%;
+      display: inline-block;
+      margin: auto;
+      line-height: 1.6;
+      font-size: 20pt;
+    }
+
+    #overlay {
+      height: 100vh;
+      width: 100vw;
+      background-color: white;
+      display: flex;
+      position: absolute;
+      transition: opacity 400ms;
+    }
+
+    #canvas {
+      height: 100vh;
+      width: 100vw;
+      font-size: 15pt;
+    }
   </style>
 </head>
 <body>
+<div id="overlay">
+  <span class="c1"></span>
+</div>
+<div id="canvas"></div>
 </body>
-<script>
-  let quotes = [];
+<script type="module">
+  import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+
+  let quotes = ["家裡的人都那樣呼喚我；小魚兒是我年幼時親人給我起的小名\n（123-124）《感冒》",
+    "醫生說：“小魚兒，你是魚，游泳最適合你了。”\n（146）《感冒》",
+    "我是魚，我是魚。水流那樣地衝擊我，我知道我是魚。\n（153）《感冒》",
+    "“該則麼做活潑的魚了” “為什麼要做一條過河的枯魚”\n（153）《感冒》",
+    "魚戲蓮葉東，魚戲蓮葉南....\n（153）《感冒》",
+    "我就把你給我的串鈴帶去了，是許多的冰塊垂掛在一些細繩上，當我走路，冰塊擊撞在一起，發出玎玎的聲音。我也把我手雕的冰魚帶去了，我告訴他們，我的玩具是奇異的，由自己的手仔細鑿成，每一次都有不同的樣子。但是他們看不見。他們並且不相信。\n（5）《玩具》",
+    "冰魚一點一點地融化了，水從指縫間滴落在地面，起先，冰魚會隱去一條尾巴，然後整個身體縮小了，變瘦了，漸漸剩下一個模糊的長條子，終於完全消失。冰串的鈴也一樣，留下空晃晃的繩段，系在一截窄木條子上。這算什麼玩具呢，他們說。\n（5–6）《玩具》",
+    "在公園裡，他們交換各種玩具，他們喜歡比較實質的東西，而我，祗好把手中的一些繩子放在口袋里，獨自在草地上奔跑起來。風把我依然滴水的手掌吹乾了。\n\n然後，我就長大了。\n（6）《玩具》",
+    "而你並不是為了實質而工作的，不是為著一個寬闊的展覽場，不是為了來觀看的群眾，也不是為了持著一支筆的人在那裡把你研究。你說，是因為這樣，所以你是快樂的，你沒有困擾。\n（6）《玩具》",
+    "有時候，他會給她一塊小小的冰，[...]讓她也做一條冰的小魚，或者一片冰的掌狀葉。她的雙手觸著冰塊，感到它們冷得異常美麗。冰總是到了第二天就融化了。[...]當它們融化的時候，緩緩地變更著形態[...]在她，這些都是新鮮的景象。\n（7）《玩具》",
+    "你是賣魚的。你是一個會做冰雕的賣魚人。我並不知道你是先開始賣魚然後才做雕刻，還是先開始做雕刻然後才賣魚，這一定是一個有趣的故事。但你說，這分別是一點也不重要的。\n（8）《玩具》",
+    "魚鱗飛躍起來的時候，真像你做雕刻的樣子你，那些細碎的冰塊，也是那樣子汨汨地四射著，也是一樣光亮明燦，也是一樣充滿了水的感覺，也是一樣地寒冷，著就是我喜歡來看你賣魚的緣故了。你其實不是在賣魚的，是嗎？你是繼續在做著雕刻，祗不過手裡握著的是魚，不是冰。不不，是在賣魚，你說。\n（9）《玩具》"];
+
+
+  for (let i = 0; i < 100; i++) {
+    await refresh()
+  }
+
+  async function refresh() {
+    let i = Math.floor(Math.random() * quotes.length);
+    showUpdatePopup(i);
+    console.log(quotes[i].length)
+
+    await sleep(quotes[i].length * 400);
+    hidePopup();
+    await sleep(2000);
+  }
+
+  function showUpdatePopup(i) {
+    document.querySelector("#overlay span").innerHTML = quotes[i].replaceAll("\n", "<br/>");
+    d3.select("#overlay span").attr("class", "c" + Math.ceil(Math.random() * 9))
+    d3.select("#overlay")
+        .style("opacity", "1")
+  }
+
+  function hidePopup() {
+    d3.select("#overlay")
+        .style("opacity", "0")
+  }
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
 </script>
 </html>
