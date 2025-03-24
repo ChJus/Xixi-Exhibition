@@ -149,7 +149,7 @@
   }
 
   let observer = new MutationObserver(() => {
-    if (visible.length < 20) {
+    if (visible.length < 25) {
       let i = Math.floor(Math.random() * quotes.length);
       visible.push({quote: quotes[i], id: makeId(quotes[i].length)});
       scrollText();
