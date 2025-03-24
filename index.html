@@ -91,21 +91,21 @@
       overflow: hidden;
     }
 
-    span {
-      width: 70%;
-      display: inline;
-      margin: auto;
-      line-height: 1.6;
-      font-size: 20pt;
-    }
-
     #overlay {
       height: 100vh;
       width: 100vw;
-      background-color: white;
+      background-color: rgb(255, 255, 255, 0.9);
       display: flex;
       position: absolute;
       transition: opacity 400ms;
+
+      span {
+        width: 70%;
+        display: inline;
+        margin: auto;
+        line-height: 1.6;
+        font-size: 20pt;
+      }
     }
 
     #canvas {
@@ -123,10 +123,12 @@
 <div id="overlay">
   <span class="c1"></span>
 </div>
-<div id="canvas"></div>
+<svg id="canvas"></svg>
 </body>
 <script type="module">
   import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+
+  let width = window.innerWidth, height = window.innerHeight;
 
   let quotes = ["家裡的人都那樣呼喚我；小魚兒是我年幼時親人給我起的小名\n（123-124）《感冒》",
     "醫生說：“小魚兒，你是魚，游泳最適合你了。”\n（146）《感冒》",
@@ -141,20 +143,36 @@
     "你是賣魚的。你是一個會做冰雕的賣魚人。我並不知道你是先開始賣魚然後才做雕刻，還是先開始做雕刻然後才賣魚，這一定是一個有趣的故事。但你說，這分別是一點也不重要的。\n（8）《玩具》",
     "魚鱗飛躍起來的時候，真像你做雕刻的樣子你，那些細碎的冰塊，也是那樣子汨汨地四射著，也是一樣光亮明燦，也是一樣充滿了水的感覺，也是一樣地寒冷，著就是我喜歡來看你賣魚的緣故了。你其實不是在賣魚的，是嗎？你是繼續在做著雕刻，祗不過手裡握著的是魚，不是冰。不不，是在賣魚，你說。\n（9）《玩具》"];
 
+  let visible = [...quotes];
+  for (let i = 0; i < visible.length; i++) {
+    visible[i] = {quote: visible[i], id: makeId(visible[i].length)};
+  }
+
+  let observer = new MutationObserver(() => {
+    if (visible.length < quotes.length) {
+      let i = Math.floor(Math.random() * quotes.length);
+      visible.push({quote: quotes[i], id: makeId(quotes[i].length)});
+      scrollText();
+    }
+  });
+
+  let config = {childList: true, subtree: true};
+  observer.observe(document.querySelector("#canvas"), config);
+
   init();
+  scrollText();
 
   for (let i = 0; i < 100; i++) {
     await refresh()
   }
 
   async function refresh() {
+    await sleep(7000);
     let i = Math.floor(Math.random() * quotes.length);
     showUpdatePopup(i);
-    console.log(quotes[i].length)
 
     await sleep(quotes[i].length * 370);
     hidePopup();
-    await sleep(2000);
   }
 
   function showUpdatePopup(i) {
@@ -177,7 +195,40 @@
     for (let i = 1; i <= 9; i++) {
       d3.select("#overlay span").attr("class", "c" + i)
     }
+
+    hidePopup();
   }
 
+  function scrollText() {
+    d3.select("#canvas")
+        .selectAll("text")
+        .data(visible, d => d.id)
+        .join(
+            enter => enter.append("text")
+                .html((d) => d.quote.replaceAll("\n", ""))
+                .attr("class", () => "c" + Math.ceil(Math.random() * 9))
+                .attr("x", () => width + Math.random() * width)
+                .attr("y", () => Math.random() * height)
+                .transition().duration((d) => Math.random() * 3000 + d.quote.length * 300).ease(d3.easeLinear)
+                .attr("x", (d) => {
+                  return -d.quote.length * 30;
+                })
+                .on("end", d => visible.splice(visible.indexOf(d), 1))
+                .remove(),
+            update => update,
+            exit => exit.remove());
+  }
+
+  function makeId(length) {
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return result;
+  }
 </script>
 </html>
