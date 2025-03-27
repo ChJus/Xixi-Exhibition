@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>西西展覽照片</title>
+  <style>
+    body {
+      margin: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #overlay {
+      height: 100vh;
+      width: 100vw;
+      background-color: rgb(255, 255, 255, 0.7);
+      display: flex;
+      position: absolute;
+      transition: opacity 400ms;
+
+      span {
+        width: 80vw;
+        height: 80vh;
+        display: flex;
+        justify-content: center;
+        margin: auto;
+        line-height: 1.6;
+        font-size: 20pt;
+
+        img {
+          display: block;
+          width: auto;
+          height: auto;
+          max-height: 100%;
+          max-width: 100%;
+        }
+      }
+    }
+
+    #canvas {
+      height: 100vh;
+      width: 100vw;
+      font-size: 15pt;
+    }
+  </style>
+</head>
+<body>
+<div id="overlay">
+  <span class="c1"></span>
+</div>
+<svg id="canvas"></svg>
+</body>
+<script type="module">
+  import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+
+  let width = window.innerWidth, height = window.innerHeight;
+
+  let photos = ["1.JPG", "2.JPG", "3.JPG", "4.JPG", "5.JPG", "6.JPG", "7.JPG", "8.JPG", "9.JPG",
+    "10.JPG", "11.JPG", "12.JPG", "13.JPG", "14.JPG", "15.JPG", "16.JPG", "17.JPG", "18.JPG"];
+
+
+  for (let i = 0; i < photos.length; i++) {
+    let img = await loadImage("照片/" + (i + 1) + ".JPG");
+    photos[i] = {photo: photos[i], id: makeId(4), width: img.width, height: img.height};
+  }
+
+  let visible = [...photos];
+
+  let observer = new MutationObserver(async () => {
+    if (visible.length < 15) {
+      let i = Math.floor(Math.random() * photos.length);
+      visible.push(photos[i]);
+      scrollImage();
+    }
+  });
+
+  let config = {childList: true, subtree: true};
+  observer.observe(document.querySelector("#canvas"), config);
+
+  hidePopup();
+  scrollImage();
+
+  for (let i = 0; i < 1000; i++) {
+    await refresh()
+  }
+
+  async function refresh() {
+    await sleep(10000);
+    let i = Math.ceil(Math.random() * photos.length);
+    showUpdatePopup(i);
+
+    await sleep(5000);
+    hidePopup();
+  }
+
+  async function showUpdatePopup(i) {
+    let img = photos[i];
+    document.querySelector("#overlay span").innerHTML = `<img src="照片/${i}.JPG" width="${img.width}" height="${img.height}" alt=""/>`;
+    d3.select("#overlay")
+        .style("opacity", "1")
+  }
+
+  function hidePopup() {
+    d3.select("#overlay")
+        .style("opacity", "0")
+  }
+
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  function scrollImage() {
+    d3.select("#canvas")
+        .selectAll("image")
+        .data(visible, d => d.id)
+        .join(
+            enter => {
+              enter.append("image")
+                  .attr("x", () => width + Math.random() * width)
+                  .attr("href", (d) => "照片/" + d.photo)
+                  .each(function (d) {
+                    let img = photos.find((element) => element.photo === d.photo)
+                    let aspectRatio = img.width / img.height;
+                    let imgHeight = (Math.random() * 0.5 + 0.2) * height;
+
+                    d3.select(this)
+                        .attr("width", `${aspectRatio * imgHeight}px`)
+                        .attr("height", `${imgHeight}px`)
+                        .attr("y", () => Math.max(Math.random() * height - imgHeight / 2, 0))
+                  })
+                  .transition().delay((d, i) => i * 2000).duration(() => 25000 + Math.random() * 10000).ease(d3.easeLinear)
+                  .attr("x", () => {
+                    return -(2500);
+                  })
+                  .on("end", d => visible.splice(visible.indexOf(d), 1))
+                  .remove()
+            },
+            update => update,
+            exit => exit.remove());
+  }
+
+  async function loadImage(d) {
+    return new Promise((resolve, reject) => {
+      let img = new Image();
+      img.onload = () => resolve(img)
+      img.onerror = reject
+      img.src = d
+    })
+  }
+
+  function makeId(length) {
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    let counter = 0;
+    while (counter < length) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      counter += 1;
+    }
+    return result;
+  }
+</script>
+</html>
