@@ -68,7 +68,7 @@
   let visible = [...photos];
 
   let observer = new MutationObserver(async () => {
-    if (visible.length < 15) {
+    if (visible.length < 10) {
       let i = Math.floor(Math.random() * photos.length);
       visible.push(photos[i]);
       scrollImage();
@@ -129,9 +129,9 @@
                         .attr("height", `${imgHeight}px`)
                         .attr("y", () => Math.max(Math.random() * height - imgHeight / 2, 0))
                   })
-                  .transition().delay((d, i) => i * 2000).duration(() => 25000 + Math.random() * 10000).ease(d3.easeLinear)
-                  .attr("x", () => {
-                    return -(2500);
+                  .transition().delay((d, i) => i * 2000).duration(() => 15000 + Math.random() * 10000).ease(d3.easeLinear)
+                  .attr("x", function () {
+                    return -d3.select(this).node().getBBox().width;
                   })
                   .on("end", d => visible.splice(visible.indexOf(d), 1))
                   .remove()
