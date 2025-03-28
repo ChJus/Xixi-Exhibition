@@ -62,15 +62,18 @@
 
   for (let i = 0; i < photos.length; i++) {
     let img = await loadImage("照片/" + (i + 1) + ".JPG");
-    photos[i] = {photo: photos[i], id: makeId(4), width: img.width, height: img.height};
+    photos[i] = {photo: photos[i], width: img.width, height: img.height};
   }
 
   let visible = [...photos];
+  for (let i = 0; i < visible.length; i++) {
+    visible[i] = {id: makeId(4), ...visible[i]};
+  }
 
   let observer = new MutationObserver(async () => {
     if (visible.length < 10) {
       let i = Math.floor(Math.random() * photos.length);
-      visible.push(photos[i]);
+      visible.push({id: makeId(4), ...photos[i]});
       scrollImage();
     }
   });
@@ -129,7 +132,7 @@
                         .attr("height", `${imgHeight}px`)
                         .attr("y", () => Math.max(Math.random() * height - imgHeight / 2, 0))
                   })
-                  .transition().delay((d, i) => i * 2000).duration(() => 15000 + Math.random() * 10000).ease(d3.easeLinear)
+                  .transition().delay((d, i) => i * 3000).duration(() => 15000 + Math.random() * 10000).ease(d3.easeLinear)
                   .attr("x", function () {
                     return -d3.select(this).node().getBBox().width;
                   })
