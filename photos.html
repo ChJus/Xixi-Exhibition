@@ -4,6 +4,11 @@
   <meta charset="UTF-8">
   <title>西西展覽照片</title>
   <style>
+    @font-face {
+      src: url("字體/Source Han Sans CN Light.otf");
+      font-family: "SourceHans";
+    }
+
     body {
       margin: 0;
       position: relative;
@@ -42,6 +47,7 @@
       height: 100vh;
       width: 100vw;
       font-size: 15pt;
+      z-index: 100;
     }
   </style>
 </head>
@@ -49,7 +55,9 @@
 <div id="overlay">
   <span class="c1"></span>
 </div>
-<svg id="canvas"></svg>
+<svg id="canvas">
+  <text x="30" y="140" text-anchor="start" font-family="SourceHans" font-size="10vw">西西的魚塘</text>
+</svg>
 </body>
 <script type="module">
   import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
